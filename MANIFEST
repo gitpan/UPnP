@@ -1,0 +1,20 @@
+Changes
+examples/dms2vodcast.pl
+examples/upnpavdump.pl
+examples/upnpdump.pl
+lib/UPnP.pm
+lib/UPnP/ActionResponse.pm
+lib/UPnP/AV/Container.pm
+lib/UPnP/AV/Content.pm
+lib/UPnP/AV/Item.pm
+lib/UPnP/AV/MediaServer.pm
+lib/UPnP/ControlPoint.pm
+lib/UPnP/Device.pm
+lib/UPnP/HTTP.pm
+lib/UPnP/HTTPResponse.pm
+lib/UPnP/Service.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/UPnP.t
+META.yml                                 Module meta-data (added by MakeMaker)
