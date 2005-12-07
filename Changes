@@ -2,7 +2,12 @@ Revision history for Perl extension UPnP.
 
 2005-12-08 Satoshi Konno <skonno@cybergarage.org>
 
-	* v1.0.1
+	  * v1.0.2
+        * Changed dms2vodcast.pl to add a option for MPEG4 output format such as 'ipod' and 'psp'.
+
+2005-12-07 Satoshi Konno <skonno@cybergarage.org>
+
+	  * v1.0.1
         * Changed dms2vodcast.pl upnpavdump.pl to parse all items in the content directory.
         * Changed upnpavdump.pl to parse all items in the content directory.
 

@@ -15,7 +15,7 @@ use Shell qw(curl ffmpeg);
 $program_name = 'DLNA Media Sever 2 Vodcast';
 $copy_right = 'Copyright (c) 2005 Satoshi Konno';
 $script_name = 'dms2vodcast.pl';
-$script_version = '1.0';
+$script_version = '1.0.2';
 
 #------------------------------
 # global variables
@@ -35,6 +35,7 @@ $rss_language = "";
 $rss_link= "";
 $rss_title = "CyberGarage";
 $requested_count = 0;
+$mp4_format = 'ipod';
 
 @command_opt = (
 ['-b', '--base-url', '<url>', 'Set the base url in the item link property of the output RSS file'],
@@ -45,6 +46,7 @@ $requested_count = 0;
 ['-l', '--rss-link', '<link>', 'Set the link tag in the output RSS file'],
 ['-r', '--requested-count', '<url>', 'Set the max request count to the media server contents'],
 ['-t', '--rss-title', '<file>', 'Set the title tag in the output RSS file'],
+['-f', '--mp4-format', '<ipod | psp>', 'Set the MPEG4 format'],
 );
 
 sub is_command_option {
@@ -108,6 +110,12 @@ for ($i=0; $i<(@ARGV); $i++) {
 		$requested_count = $ARGV[++$i];
 	} elsif ($opt_short_name eq '-t') {
 		$rss_title = $ARGV[++$i];
+	} elsif ($opt_short_name eq '-f') {
+		$mp4_format = $ARGV[++$i];
+		if ($mp4_format ne 'ipod' && $mp4_format ne 'psp') {
+			print "Unkown MPEG4 format : $mp4_format !!\n";
+			exit 1;
+		}
 	} else {
 		$rss_file_name = $opt;
 	}
@@ -127,6 +135,7 @@ print "  language : $rss_language\n";
 print "  base url : $rss_base_url\n";
 print "  base directory : $base_directory\n";
 print "  requested_count : $requested_count\n";
+print "  mp4_format : $mp4_format\n";
 
 #------------------------------
 # main
@@ -211,6 +220,9 @@ print RSS_FILE $rss_footer;
 
 	close(RSS_FILE);
 
+$rss_outputed_items = @dms_content_list;
+print "Outputed $rss_outputed_items RSS items to $output_rss_filename\n";
+
 #------------------------------
 # parse_content_directory
 #------------------------------
@@ -269,15 +281,20 @@ sub mpeg2tompeg4 {
 	$filename_body =~ s/\//-/g;
 	
 	my $mpeg2_file_name = $filename_body . ".mpeg";
-	my $mpeg4_file_name = $filename_body . ".m4v";
+	my $mpeg4_file_name = $filename_body . "_" . $mp4_format . ".m4v";
 	my $output_mpeg4_file_name = $base_directory . $mpeg4_file_name;
 
 	if (!(-e $output_mpeg4_file_name)) {	
 		$curl_opt = "\"$url\" -o \"$mpeg2_file_name\"";
 		print "curl $curl_opt\n";
 		curl($curl_opt);
-	
-		$ffmpeg_opt = "-y -i \"$mpeg2_file_name\" -bitexact -fixaspect -s 320x240 -r 29.97 -b 850 -acodec aac -ac 2 -ar 44100 -ab 64 -f mp4 \"$output_mpeg4_file_name\"";
+
+		if ($mp4_format eq 'psp') {	
+			$ffmpeg_opt = "-y -i \"$mpeg2_file_name\" -bitexact -fixaspect -s 320x240 -r 29.97 -b 768 -ar 24000 -ab 32 -f psp \"$output_mpeg4_file_name\"";
+		}
+		else {
+			$ffmpeg_opt = "-y -i \"$mpeg2_file_name\" -bitexact -fixaspect -s 320x240 -r 29.97 -b 850 -acodec aac -ac 2 -ar 44100 -ab 64 -f mp4 \"$output_mpeg4_file_name\"";
+		}
 	
 		print "ffmpeg $ffmpeg_opt\n";
 		ffmpeg($ffmpeg_opt);
