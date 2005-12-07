@@ -1,3 +1,5 @@
+#!/usr/local/bin/perl
+
 use UPnP::ControlPoint;
 use UPnP::AV::MediaServer;
 
@@ -166,7 +168,7 @@ foreach $dev (@dev_list) {
 #------------------------------
 
 if (@dms_content_list <= 0) {
-	"Couldn't find video contents !!\n";
+	print "Couldn't find video contents !!\n";
 	exit 1;
 }
 
@@ -178,6 +180,10 @@ $rss_header = <<"RSS_HEADER";
 <?xml version="1.0" encoding="utf-8"?>
 <rss xmlns:itunes="http://www.itunes.com/DTDs/Podcast-1.0.dtd" version="2.0">
 <channel>
+<title>$rss_title</title>
+<language>$rss_language</language>
+<description>$rss_description</description>
+<link>$rss_link</link>
 RSS_HEADER
 print RSS_FILE $rss_header;
 
@@ -189,7 +195,7 @@ foreach $content (@dms_content_list){
 $mp4_link = $rss_base_url . $fname;
 $mp4_item = <<"RSS_MP4_ITEM";
 <item>
-<description>$title</description>
+<title>$title</title>
 <guid isPermalink="false">$mp4_link</guid>
 <enclosure url="$mp4_link" length="$fsize" type="video/mp4" />
 </item>
@@ -211,14 +217,14 @@ print RSS_FILE $rss_footer;
 
 sub parse_content_directory {
 	($mediaServer, $content) = @_;
-	$objid = $content->getid();
+	my $objid = $content->getid();
 
 	if ($content->isitem()) {
-		$mime = $content->getcontenttype();
+		my $mime = $content->getcontenttype();
 		if ($mime =~ m/video/) {
-			$dms_content_count = @dms_content_list;
+			my $dms_content_count = @dms_content_list;
 			if ($requested_count == 0 || $dms_content_count < $requested_count) {
-				$mp4_content = mpeg2tompeg4($mediaServer, $content);
+				my $mp4_content = mpeg2tompeg4($mediaServer, $content);
 				if (defined($mp4_content)) {
 					push(@dms_content_list, $mp4_content);
 				}
@@ -230,7 +236,7 @@ sub parse_content_directory {
 		return;
 	}
 
-	@child_content_list = $mediaServer->getcontentlist(ObjectID => $objid );
+	my @child_content_list = $mediaServer->getcontentlist(ObjectID => $objid );
 	
 	if (@child_content_list <= 0) {
 		return;
@@ -247,31 +253,31 @@ sub parse_content_directory {
 
 sub mpeg2tompeg4 {
 	($mediaServer, $content) = @_;
-	$objid = $content->getid();
-	$title = $content->gettitle();
-	$url = $content->geturl();
+	my $objid = $content->getid();
+	my $title = $content->gettitle();
+	my $url = $content->geturl();
 	
 	print "[$objid] $title ($url)\n";
 	
-	$dev = $mediaServer->getdevice();
-	$dev_friendlyname = $dev->getfriendlyname();
-	$dev_udn = $dev->getudn();
+	my $dev = $mediaServer->getdevice();
+	my $dev_friendlyname = $dev->getfriendlyname();
+	my $dev_udn = $dev->getudn();
 	$dev_udn =~ s/:/-/g;
 	
-	$filename_body = $dev_friendlyname . "_" . $dev_udn . "_" . $objid;
+	my $filename_body = $dev_friendlyname . "_" . $dev_udn . "_" . $objid;
 	$filename_body =~ s/ //g;
 	$filename_body =~ s/\//-/g;
 	
-	$mpeg2_file_name = $filename_body . ".mpeg";
-	$mpeg4_file_name = $filename_body . ".m4v";
-	$output_mpeg4_file_name = $base_directory . $mpeg4_file_name;
+	my $mpeg2_file_name = $filename_body . ".mpeg";
+	my $mpeg4_file_name = $filename_body . ".m4v";
+	my $output_mpeg4_file_name = $base_directory . $mpeg4_file_name;
 
 	if (!(-e $output_mpeg4_file_name)) {	
 		$curl_opt = "\"$url\" -o \"$mpeg2_file_name\"";
 		print "curl $curl_opt\n";
 		curl($curl_opt);
 	
-		$ffmpeg_opt = "-y -i \"$mpeg2_file_name\" -bitexact -vcodec mpeg4 -fixaspect -s 320x240 -r 29.97 -b 850 -acodec aac -ac 2 -ar 44100 -ab 64 -f mp4 \"$output_mpeg4_file_name\"";
+		$ffmpeg_opt = "-y -i \"$mpeg2_file_name\" -bitexact -fixaspect -s 320x240 -r 29.97 -b 850 -acodec aac -ac 2 -ar 44100 -ab 64 -f mp4 \"$output_mpeg4_file_name\"";
 	
 		print "ffmpeg $ffmpeg_opt\n";
 		ffmpeg($ffmpeg_opt);
@@ -283,7 +289,7 @@ sub mpeg2tompeg4 {
 		return undef;
 	}
 	
-	$mpeg4_file_size = -s $output_mpeg4_file_name;
+	my $mpeg4_file_size = -s $output_mpeg4_file_name;
 	
 	if ($mpeg4_file_size <= 0) {
 		return undef;

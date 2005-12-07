@@ -1,3 +1,5 @@
+#!/usr/local/bin/perl
+
 use UPnP::ControlPoint;
 
 my $obj = UPnP::ControlPoint->new();

@@ -1,3 +1,5 @@
+#!/usr/local/bin/perl
+
 use UPnP::ControlPoint;
 use UPnP::AV::MediaServer;
 
@@ -13,7 +15,7 @@ while (@dev_list <= 0 || $retry_cnt > 5) {
 
 $devNum= 0;
 foreach $dev (@dev_list) {
-	$device_type = $dev->getdevicetype();
+	my $device_type = $dev->getdevicetype();
 	if  ($device_type ne 'urn:schemas-upnp-org:device:MediaServer:1') {
 		next;
 	}
@@ -21,10 +23,10 @@ foreach $dev (@dev_list) {
 	unless ($dev->getservicebyname('urn:schemas-upnp-org:service:ContentDirectory:1')) {
 		next;
 	}
-	$mediaServer = UPnP::AV::MediaServer->new();
+	my $mediaServer = UPnP::AV::MediaServer->new();
 	$mediaServer->setdevice($dev);
-	@content_list = $mediaServer->getcontentlist(ObjectID => 0);
-	foreach $content (@content_list) {
+	my @content_list = $mediaServer->getcontentlist(ObjectID => 0);
+	foreach my $content (@content_list) {
 		print_content($mediaServer, $content, 1);
 	}
 	$devNum++;
@@ -52,7 +54,7 @@ sub print_content {
 		return;
 	}
 
-	@child_content_list = $mediaServer->getcontentlist(ObjectID => $id );
+	my @child_content_list = $mediaServer->getcontentlist(ObjectID => $id );
 	
 	if (@child_content_list <= 0) {
 		return;
