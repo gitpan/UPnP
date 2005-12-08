@@ -92,7 +92,7 @@ __END__
 
 =head1 NAME
 
-UPnP::AV::Item - Perl extension for UPnP.
+UPnP::AV::Content - Perl extension for UPnP.
 
 =head1 SYNOPSIS
 

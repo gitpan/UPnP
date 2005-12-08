@@ -187,7 +187,7 @@ __END__
 
 =head1 NAME
 
-UPnP::ControlPoint - Perl extension for UPnP.
+UPnP::Device - Perl extension for UPnP.
 
 =head1 SYNOPSIS
 

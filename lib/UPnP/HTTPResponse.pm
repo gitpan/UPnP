@@ -87,7 +87,7 @@ __END__
 
 =head1 NAME
 
-UPnP::HTTP - Perl extension for UPnP.
+UPnP::HTTPResponse - Perl extension for UPnP.
 
 =head1 DESCRIPTION
 
